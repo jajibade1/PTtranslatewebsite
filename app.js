@@ -99,7 +99,7 @@ function App() {
     <div className="container">
       <div className="card">
         <h1>European Portuguese Translator</h1>
-        <p className="lead">Translate English → European Portuguese (pt-PT). Demo uses LibreTranslate.</p>
+        <p className="lead">Translate English → European Portuguese (pt-PT).
 
         <div className="grid">
           <div>
