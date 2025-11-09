@@ -67,7 +67,7 @@ function App() {
   }
   throw new Error('Invalid API response');
 }
-    
+
   function localTranslate(text) {
     const normal = text.trim().toLowerCase();
     if (localDictionary[normal]) return localDictionary[normal];
@@ -99,7 +99,7 @@ function App() {
     <div className="container">
       <div className="card">
         <h1>European Portuguese Translator</h1>
-        <p className="lead">Translate English → European Portuguese (pt-PT).
+        <p className="lead">Translate English → European Portuguese (pt-PT). </p>
 
         <div className="grid">
           <div>
