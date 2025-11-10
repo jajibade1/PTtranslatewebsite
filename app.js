@@ -88,7 +88,7 @@ function App() {
     if (!output) return;
     const item = { text: output, source: input, ts: Date.now() };
     setSaved(s => [item, ...s]);
-    pushHistory({ ...item, saved: true }); // Add saved flag to history
+    pushHistory({ ...item, saved: true });
   }
 
   function handleSpeak(textToSpeak = output) {
@@ -107,6 +107,14 @@ function App() {
     const d = new Date(ts);
     return `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
   }
+
+  // Remove individual items
+  function removeHistory(index) { setHistory(h => h.filter((_, i) => i !== index)); }
+  function removeSaved(index) { setSaved(s => s.filter((_, i) => i !== index)); }
+
+  // Delete all
+  function deleteAllHistory() { setHistory([]); }
+  function deleteAllSaved() { setSaved([]); }
 
   return (
     <div className="container">
@@ -142,7 +150,9 @@ function App() {
 
         {/* History & Saved */}
         <div style={{ marginTop: 20 }}>
-          <h2>History</h2>
+          <h2>History 
+            <button className="btn small" style={{ marginLeft: 10 }} onClick={deleteAllHistory}>Delete All</button>
+          </h2>
           {history.length === 0 && <p style={{ color: '#9ca3af' }}>No translations yet.</p>}
           <ul>
             {history.map((h, i) => (
@@ -151,11 +161,14 @@ function App() {
                 {h.saved && <span style={{ color: 'green', marginLeft: 6 }}>(Saved)</span>}
                 <br />
                 <small style={{ color: '#9ca3af' }}>{formatDate(h.ts)}</small>
+                <button className="btn small" style={{ marginLeft: 6 }} onClick={() => removeHistory(i)}>Remove</button>
               </li>
             ))}
           </ul>
 
-          <h2>Saved Translations</h2>
+          <h2>Saved Translations 
+            <button className="btn small" style={{ marginLeft: 10 }} onClick={deleteAllSaved}>Delete All</button>
+          </h2>
           {saved.length === 0 && <p style={{ color: '#9ca3af' }}>No saved translations yet.</p>}
           <ul>
             {saved.map((s, i) => (
@@ -163,6 +176,7 @@ function App() {
                 <strong>{s.source}</strong> → <em>{s.text}</em>
                 <br />
                 <small style={{ color: '#9ca3af' }}>{formatDate(s.ts)}</small>
+                <button className="btn small" style={{ marginLeft: 6 }} onClick={() => removeSaved(i)}>Remove</button>
               </li>
             ))}
           </ul>
