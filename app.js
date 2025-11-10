@@ -54,19 +54,19 @@ function App() {
   }
 
   async function translateWithAPI(text) {
-  const endpoint = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(
-    text
-  )}&langpair=en|pt-PT`;
+    const endpoint = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(
+      text
+    )}&langpair=en|pt-PT`;
 
-  const resp = await fetch(endpoint);
-  if (!resp.ok) throw new Error('API error ' + resp.status);
+    const resp = await fetch(endpoint);
+    if (!resp.ok) throw new Error('API error ' + resp.status);
 
-  const data = await resp.json();
-  if (data.responseData && data.responseData.translatedText) {
-    return data.responseData.translatedText;
+    const data = await resp.json();
+    if (data.responseData && data.responseData.translatedText) {
+      return data.responseData.translatedText;
+    }
+    throw new Error('Invalid API response');
   }
-  throw new Error('Invalid API response');
-}
 
   function localTranslate(text) {
     const normal = text.trim().toLowerCase();
@@ -76,11 +76,19 @@ function App() {
     return null;
   }
 
-  function pushHistory(item) { setHistory(h => [item, ...h].slice(0, 60)); }
-  function handleCopy() { navigator.clipboard.writeText(output || ''); }
+  function pushHistory(item) {
+    setHistory(h => [item, ...h].slice(0, 60));
+  }
+
+  function handleCopy() {
+    navigator.clipboard.writeText(output || '');
+  }
+
   function handleSave() {
     if (!output) return;
-    setSaved(s => [{ text: output, source: input, ts: Date.now() }, ...s]);
+    const item = { text: output, source: input, ts: Date.now() };
+    setSaved(s => [item, ...s]);
+    pushHistory({ ...item, saved: true }); // Add saved flag to history
   }
 
   function handleSpeak(textToSpeak = output) {
@@ -93,6 +101,11 @@ function App() {
     if (pt) u.voice = pt;
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(u);
+  }
+
+  function formatDate(ts) {
+    const d = new Date(ts);
+    return `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
   }
 
   return (
@@ -125,6 +138,34 @@ function App() {
             </div>
             {error && <div style={{ color: 'crimson', marginTop: 10 }}>{error}</div>}
           </div>
+        </div>
+
+        {/* History & Saved */}
+        <div style={{ marginTop: 20 }}>
+          <h2>History</h2>
+          {history.length === 0 && <p style={{ color: '#9ca3af' }}>No translations yet.</p>}
+          <ul>
+            {history.map((h, i) => (
+              <li key={i} style={{ marginBottom: 6 }}>
+                <strong>{h.source}</strong> → <em>{h.target}</em>
+                {h.saved && <span style={{ color: 'green', marginLeft: 6 }}>(Saved)</span>}
+                <br />
+                <small style={{ color: '#9ca3af' }}>{formatDate(h.ts)}</small>
+              </li>
+            ))}
+          </ul>
+
+          <h2>Saved Translations</h2>
+          {saved.length === 0 && <p style={{ color: '#9ca3af' }}>No saved translations yet.</p>}
+          <ul>
+            {saved.map((s, i) => (
+              <li key={i} style={{ marginBottom: 6 }}>
+                <strong>{s.source}</strong> → <em>{s.text}</em>
+                <br />
+                <small style={{ color: '#9ca3af' }}>{formatDate(s.ts)}</small>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>
